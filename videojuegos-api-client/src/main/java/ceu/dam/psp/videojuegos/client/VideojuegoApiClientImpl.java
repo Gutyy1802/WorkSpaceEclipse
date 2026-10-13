@@ -18,7 +18,7 @@ import tools.jackson.databind.ObjectMapper;
 
 public class VideojuegoApiClientImpl implements VideojuegoApiClient {
 
-	private String urlBase = "https://ca0a1e3fd17dbc62ecf3.free.beeceptor.com/api/videojuego";
+	private String urlBase = "https://ca0a1e3fd17dbc62ec55.free.beeceptor.com/api/videojuego";
 	private HttpClient httpClient;
 
 	public VideojuegoApiClientImpl(String uuidUrl) {
