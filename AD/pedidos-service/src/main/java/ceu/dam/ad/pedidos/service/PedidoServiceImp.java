@@ -1,8 +1,8 @@
 package ceu.dam.ad.pedidos.service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -11,6 +11,7 @@ import ceu.dam.ad.pedidos.model.ArticuloPedido;
 import ceu.dam.ad.pedidos.model.Pedido;
 import ceu.dam.ad.pedidos.repositorio.ClienteArticulo;
 import ceu.dam.ad.pedidos.repositorio.ClientePedido;
+import jakarta.transaction.Transactional;
 
 @Service
 public class PedidoServiceImp implements PedidoService{
@@ -26,13 +27,8 @@ public class PedidoServiceImp implements PedidoService{
 	@Override
 	public Pedido consultarPedido(Long idPedido) throws PedidoException, PedidoNotFoundException {
 		try {
-			Optional<Pedido> pedidoOpt = repoPedido.findById(idPedido);
+			Pedido p = repoPedido.findById(idPedido).orElseThrow(() -> new PedidoNotFoundException("Pedido no encontrado con el ID indicado" + idPedido));
 			
-			if (pedidoOpt.isEmpty()) {
-				throw new PedidoNotFoundException("Pedido no encontrado con el ID indicado" + idPedido);
-			}
-			
-			Pedido p = pedidoOpt.get();
 			p.setArticulos(repoArticulo.findByIdPedido(idPedido));
 			
 			return p;
@@ -42,36 +38,58 @@ public class PedidoServiceImp implements PedidoService{
 	}
 
 	@Override
+	@Transactional
 	public Pedido crearPedido(Pedido pedido) throws PedidoException {
 		try {
-			pedido.setTotal(pedido.getSubtotal().add(((pedido.getImpuestos().divide(BigDecimal.valueOf(100))).multiply(pedido.getSubtotal()))));
-			repoPedido.save(pedido);
+			BigDecimal sumaExenta = pedido.getArticulos().stream()
+		            .filter(a -> a.getExentoIva())
+		            .map(a -> a.getPrecioSinIva())
+		            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		    BigDecimal sumaNoExento = pedido.getArticulos().stream()
+		            .filter(a -> !a.getExentoIva())
+		            .map(a -> a.getPrecioSinIva())
+		            .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+		    BigDecimal subtotal = sumaExenta.add(sumaNoExento);
+		    BigDecimal impuesto = sumaNoExento.multiply(BigDecimal.valueOf(0.21)).setScale(2);
+		    BigDecimal total = subtotal.add(impuesto);
+
+		    pedido.setSubtotal(subtotal);
+		    pedido.setImpuestos(impuesto);
+		    pedido.setTotal(total);
+
+		    repoPedido.save(pedido);
 			
-			return repoPedido.findById(pedido.getIdPedido()).get();
+			for (ArticuloPedido a  : pedido.getArticulos()) {
+				a.setIdPedido(pedido.getIdPedido());
+				
+				repoArticulo.save(a);
+			}
+			
+			return pedido;
 		} catch (DataAccessException e) {
 			throw new PedidoException("Error al acceder a la bbdd", e);
 		}
 	}
 
-	@SuppressWarnings("null")
 	@Override
 	public List<Long> buscarPedidosArticulo(String codBarras) throws PedidoException, PedidoNotFoundException {
-		try {
-			List<ArticuloPedido> listArticulos = repoArticulo.findByCodBarras(codBarras);
-			
-			if (listArticulos.isEmpty()) {
-				throw new PedidoNotFoundException("Pedido no encontrado con codigo de barras: " + codBarras);
+		try { 
+			List<ArticuloPedido> listArticulo = repoArticulo.findByCodBarras(codBarras);
+			List<Long> listIdPedidos = new ArrayList<Long>();
+ 
+			if (listArticulo.isEmpty()) {
+				throw new PedidoNotFoundException("No existen ningun articulo con ese codigo de barras");
 			}
-			
-			List<Long> listIdPedidos = null;
-			for (ArticuloPedido articuloPedido : listArticulos) {
-				listIdPedidos.add(articuloPedido.getIdPedido());
+ 
+			for (ArticuloPedido a : listArticulo) {
+				listIdPedidos.add(a.getIdPedido());				
 			}
-			
+ 
 			return listIdPedidos;
 		} catch (DataAccessException e) {
 			throw new PedidoException("Error al acceder a la bbdd", e);
 		}
 	}
-
 }
