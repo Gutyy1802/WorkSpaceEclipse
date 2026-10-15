@@ -1,11 +1,13 @@
 package ceu.dam.ad.pedidos.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
+import ceu.dam.ad.pedidos.model.ArticuloPedido;
 import ceu.dam.ad.pedidos.model.Pedido;
 import ceu.dam.ad.pedidos.repositorio.ClienteArticulo;
 import ceu.dam.ad.pedidos.repositorio.ClientePedido;
@@ -35,24 +37,41 @@ public class PedidoServiceImp implements PedidoService{
 			
 			return p;
 		} catch (DataAccessException e) {
-			throw new PedidoException("Error", e);
+			throw new PedidoException("Error al acceder a la bbdd", e);
 		}
 	}
 
 	@Override
 	public Pedido crearPedido(Pedido pedido) throws PedidoException {
 		try {
+			pedido.setTotal(pedido.getSubtotal().add(((pedido.getImpuestos().divide(BigDecimal.valueOf(100))).multiply(pedido.getSubtotal()))));
 			repoPedido.save(pedido);
+			
+			return repoPedido.findById(pedido.getIdPedido()).get();
 		} catch (DataAccessException e) {
-			throw new PedidoException("Error", e);
+			throw new PedidoException("Error al acceder a la bbdd", e);
 		}
-		return null;
 	}
 
+	@SuppressWarnings("null")
 	@Override
 	public List<Long> buscarPedidosArticulo(String codBarras) throws PedidoException, PedidoNotFoundException {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			List<ArticuloPedido> listArticulos = repoArticulo.findByCodBarras(codBarras);
+			
+			if (listArticulos.isEmpty()) {
+				throw new PedidoNotFoundException("Pedido no encontrado con codigo de barras: " + codBarras);
+			}
+			
+			List<Long> listIdPedidos = null;
+			for (ArticuloPedido articuloPedido : listArticulos) {
+				listIdPedidos.add(articuloPedido.getIdPedido());
+			}
+			
+			return listIdPedidos;
+		} catch (DataAccessException e) {
+			throw new PedidoException("Error al acceder a la bbdd", e);
+		}
 	}
 
 }

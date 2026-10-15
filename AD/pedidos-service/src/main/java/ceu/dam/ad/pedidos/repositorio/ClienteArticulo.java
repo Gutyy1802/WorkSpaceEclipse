@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface ClienteArticulo extends JpaRepository<ArticuloPedido, Long>{
 	List<ArticuloPedido> findByIdPedido(Long idPedido);
+	
+	List<ArticuloPedido> findByCodBarras(String codBarras);
 }

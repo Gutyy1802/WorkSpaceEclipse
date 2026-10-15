@@ -25,5 +25,4 @@ public class ArticuloPedido {
 	private BigDecimal precioSinIva;
 	@Column(name = "exento")
 	private Boolean exentoIva; 
-
 }

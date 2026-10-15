@@ -28,6 +28,4 @@ public class Pedido {
 	private BigDecimal impuestos;
 	@Transient
 	private List<ArticuloPedido> articulos;
-	
-
 }
