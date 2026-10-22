@@ -1,36 +1,29 @@
 package ceu.dam.ad.pedidos.service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
-import ceu.dam.ad.pedidos.model.ArticuloPedido;
 import ceu.dam.ad.pedidos.model.Pedido;
-import ceu.dam.ad.pedidos.repositorio.ClienteArticulo;
-import ceu.dam.ad.pedidos.repositorio.ClientePedido;
+import ceu.dam.ad.pedidos.repositorio.PedidoRepository;
 import jakarta.transaction.Transactional;
 
 @Service
 public class PedidoServiceImp implements PedidoService{
 
-	private final ClientePedido repoPedido;
-	private final ClienteArticulo repoArticulo;
+	private final PedidoRepository repo;
 	
-	public PedidoServiceImp(ClientePedido repo, ClienteArticulo repoArticulo) {
-		this.repoPedido = repo;
-		this.repoArticulo = repoArticulo;
+	public PedidoServiceImp(PedidoRepository repo) {
+		this.repo = repo;
 	}
 	
 	@Override
 	public Pedido consultarPedido(Long idPedido) throws PedidoException, PedidoNotFoundException {
 		try {
-			Pedido p = repoPedido.findById(idPedido).orElseThrow(() -> new PedidoNotFoundException("Pedido no encontrado con el ID indicado" + idPedido));
-			
-			p.setArticulos(repoArticulo.findByIdPedido(idPedido));
-			
+			Pedido p = repo.findById(idPedido).orElseThrow(
+					() -> new PedidoNotFoundException("Pedido no encontrado con el ID indicado" + idPedido));
 			return p;
 		} catch (DataAccessException e) {
 			throw new PedidoException("Error al acceder a la bbdd", e);
@@ -59,15 +52,7 @@ public class PedidoServiceImp implements PedidoService{
 		    pedido.setImpuestos(impuesto);
 		    pedido.setTotal(total);
 
-		    repoPedido.save(pedido);
-			
-			for (ArticuloPedido a  : pedido.getArticulos()) {
-				a.setIdPedido(pedido.getIdPedido());
-				
-				repoArticulo.save(a);
-			}
-			
-			return pedido;
+		    return repo.save(pedido);
 		} catch (DataAccessException e) {
 			throw new PedidoException("Error al acceder a la bbdd", e);
 		}
@@ -76,18 +61,14 @@ public class PedidoServiceImp implements PedidoService{
 	@Override
 	public List<Long> buscarPedidosArticulo(String codBarras) throws PedidoException, PedidoNotFoundException {
 		try { 
-			List<ArticuloPedido> listArticulo = repoArticulo.findByCodBarras(codBarras);
-			List<Long> listIdPedidos = new ArrayList<Long>();
- 
-			if (listArticulo.isEmpty()) {
-				throw new PedidoNotFoundException("No existen ningun articulo con ese codigo de barras");
+			List<Long> listaPedidos = repo.findByArticulosCodBarras(codBarras).stream()
+					.map(p -> p.getIdPedido())
+					.distinct()
+					.toList();
+			if (listaPedidos.isEmpty()) {
+				throw new PedidoNotFoundException("Pedido no encontrado con articulos con codigo de brras:" + codBarras);
 			}
- 
-			for (ArticuloPedido a : listArticulo) {
-				listIdPedidos.add(a.getIdPedido());				
-			}
- 
-			return listIdPedidos;
+			return listaPedidos;
 		} catch (DataAccessException e) {
 			throw new PedidoException("Error al acceder a la bbdd", e);
 		}

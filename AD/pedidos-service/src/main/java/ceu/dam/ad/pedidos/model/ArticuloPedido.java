@@ -18,7 +18,6 @@ public class ArticuloPedido {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private Long idPedido;
 	@Column(name = "codigo_barras")
 	private String codBarras;
 	@Column(name = "descripcion")

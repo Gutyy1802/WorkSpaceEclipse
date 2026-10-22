@@ -31,7 +31,7 @@ public class TestPedido {
 		}
 	}
 	
-	public static Pedido damePedido() {
+	public Pedido damePedido() {
 		Pedido p = new Pedido();
 		p.setDniCliente("1111111X");
 		p.setFechaPedido(LocalDate.now());

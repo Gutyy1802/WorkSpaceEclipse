@@ -16,6 +16,8 @@ public class PedidosServiceApplication {
 		ConfigurableApplicationContext context = SpringApplication.run(PedidosServiceApplication.class, args);
 		TestPedido test = context.getBean(TestPedido.class);
 		
+		test.testConsultar(4L);
+		test.damePedido();
 		test.consultarPedido("COD1");
 	}
 }
