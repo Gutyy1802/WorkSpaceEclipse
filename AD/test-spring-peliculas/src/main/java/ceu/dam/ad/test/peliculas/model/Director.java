@@ -21,6 +21,6 @@ public class Director {
 	private Long id;
 	private String nombre;
 	
-	@OneToMany(fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "director")
 	private List<Pelicula> peliculas;
 }
