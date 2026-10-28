@@ -19,9 +19,4 @@ public interface PeliculaRepository extends JpaRepository<Pelicula, Long> {
 	List<Pelicula> findByEstrenoAfter(Integer añoDesde);
 	
 	Optional<Pelicula> findByTitulo(String titulo);
-	
-	
-	
-	
-	
 }
