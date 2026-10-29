@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import ceu.dam.ad.orm.practicas.basicas.ejercicio1.model.Episodio;
 import ceu.dam.ad.orm.practicas.basicas.ejercicio1.model.Serie;
 import ceu.dam.ad.orm.practicas.basicas.ejercicio1.model.Temporada;
@@ -11,14 +13,18 @@ import ceu.dam.ad.orm.practicas.basicas.ejercicio1.model.Trailer;
 import ceu.dam.ad.orm.practicas.basicas.ejercicio1.service.SerieNotFoundException;
 import ceu.dam.ad.orm.practicas.basicas.ejercicio1.service.SeriesService;
 import ceu.dam.ad.orm.practicas.basicas.ejercicio1.service.SeriesServiceException;
-import ceu.dam.ad.orm.practicas.basicas.ejercicio1.service.SeriesServiceImpl;
 
+@Component
 public class Test1 {
+	private final SeriesService service;
+
+	Test1(SeriesService service) {
+		this.service = service;
+	}
 
 	public void test() {
 		Serie serie = createTestSerie("Los lugares ocultos");
 		
-		SeriesService service = new SeriesServiceImpl();
 		try {
 			// Test crear
 			serie = service.crearSerie(serie);
