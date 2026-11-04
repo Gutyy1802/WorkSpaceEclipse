@@ -1,6 +1,7 @@
 package ceu.dam.pedidos.model;
 
-import java.time.LocalDate;
+
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,7 +19,7 @@ public class Envio {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String codigoSeguimiento;
-	private LocalDate fechaRegistro;
+	private LocalDateTime fechaRegistro;
 	private double pesoKg;
 	private String estado;
 	private double temperaturaCelsius;

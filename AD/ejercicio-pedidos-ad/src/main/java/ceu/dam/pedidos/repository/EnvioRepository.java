@@ -7,5 +7,10 @@ import java.util.List;
 
 
 public interface EnvioRepository extends JpaRepository<Envio, Long>{
-	List<Envio> findByTemperaturaCelsiusGreaterThanOrLessThan(double temperaturaCelsius);
+	List<Envio> findByTemperaturaCelsiusGreaterThanOrTemperaturaCelsiusLessThan(
+		    double limiteSuperior, double limiteInferior);
+	
+	List<Envio> findByCodigoSeguimientoIn(List<String> codigos);
+	
+	Envio findFirstByEstadoOrderByPesoKgDesc(String estado);
 }
