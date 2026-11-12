@@ -5,10 +5,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
+import ceu.dam.ad.orm.practicas.basicas.ejercicio1.service.SeriesService;
 import ceu.dam.ad.orm.practicas.basicas.ejercicio3.modelo.CentroComercial;
 import ceu.dam.ad.orm.practicas.basicas.ejercicio3.modelo.Marca;
 import ceu.dam.ad.orm.practicas.basicas.ejercicio3.modelo.Pais;
 import ceu.dam.ad.orm.practicas.basicas.ejercicio3.modelo.Tienda;
+import ceu.dam.ad.orm.practicas.basicas.ejercicio3.repository.CentroComercialRepository;
 import ceu.dam.ad.orm.practicas.basicas.ejercicio3.service.ComercialException;
 import ceu.dam.ad.orm.practicas.basicas.ejercicio3.service.ComercialService;
 import ceu.dam.ad.orm.practicas.basicas.ejercicio3.service.ComercialServiceImpl;
@@ -22,8 +24,16 @@ public class Test3 {
 //	DELETE FROM centro_comercial;
 //	DELETE FROM marcas;
 
+	private final SeriesService service;
+	private final CentroComercialRepository repo;
+
+	Test3(SeriesService service, CentroComercialRepository repo) {
+		this.service = service;
+		this.repo = repo;
+	}
+	
 	public void test() {
-		ComercialService service = new ComercialServiceImpl();
+		ComercialService service = new ComercialServiceImpl(repo);
 		Scanner sc = new Scanner(System.in);
 		Pais paisUS = null;
 		Pais paisES = null;
