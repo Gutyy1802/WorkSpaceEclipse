@@ -81,13 +81,11 @@ public class UsuarioController {
 			@RequestParam(required =false) 
 			@DateTimeFormat(pattern = "dd-MM-yyyy") LocalDate fechaMinima) {
 		
-		
-		//return mapper.map(service.buscarArticulos(filtro, filtro, fechaMinima), BuscarArticuloResponseDto.class);
-		
-		return null;
+		List<Articulo> encontrados = service.buscarArticulos(filtro, filtro, fechaMinima);
+		return encontrados.stream().map(a -> mapper.map(a, BuscarArticuloResponseDto.class)).toList();
 	}
 	
+	public void comprarArticulo(Long codigo) {
+		//Usuario u = service.consultarUsuario(null)
+	}
 }
-//	public void comprarArticulo(Long codigo) {
-//		
-//	}
