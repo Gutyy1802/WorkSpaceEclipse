@@ -20,18 +20,18 @@ import ceu.dam.ad.user.services.UserNotFoundException;
 import ceu.dam.ad.user.services.UserService;
 import ceu.dam.ad.user.services.UserUnauthorizedException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/user")
+@SecurityRequirement(name="ApiKeyAuth")
+@RequiredArgsConstructor
 public class UserController {
-	final UserService service;
-	private final ModelMapper mapper;
 	
-	public UserController(UserService service) {
-		this.service = service;
-		this.mapper = new ModelMapper();
-	}
+	final UserService service;
+	final ModelMapper mapper;
 
 	@PostMapping
 	public UserResponseDto createUser(@Valid @RequestBody UserCreateRequestDto request) throws DuplicateUserException, UserException {

@@ -34,7 +34,7 @@ public class ApikeyFilter extends OncePerRequestFilter{
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
 		String url = request.getRequestURI();
-		if (url.contains("/swagger") || url.contains("api.docs")) {
+		if (url.contains("/swagger") || url.contains("api-docs")) {
 			return true;
 		}
 		return false;

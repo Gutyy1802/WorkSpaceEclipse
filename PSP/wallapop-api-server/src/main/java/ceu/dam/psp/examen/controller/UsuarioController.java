@@ -28,19 +28,18 @@ import ceu.dam.psp.examen.exceptions.UsuarioDuplicadoException;
 import ceu.dam.psp.examen.model.Articulo;
 import ceu.dam.psp.examen.service.WallapopService;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/wallapop")
+@RequiredArgsConstructor
+@SecurityRequirement(name="ApiKeyAuth")
 public class UsuarioController {
 
 	private final WallapopService service;
 	private final ModelMapper mapper;
-	
-	UsuarioController(WallapopService service, ModelMapper mapper) {
-		this.service = service;
-		this.mapper = mapper;
-	}
 	
 	@PostMapping("/usuarios")
 	public CrearUsuarioResponseDto crearUsuario(@Valid @RequestBody CrearUsuarioRequestDto request) throws UsuarioDuplicadoException {
